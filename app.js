@@ -4,13 +4,6 @@ const fs = require('fs');
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
-
-var obj = {
-    words: []
-};
-obj.words.push("naruto");
-var json = JSON.stringify(obj);
-
 app.get('/api/delete', (req, res) => {
     const fs = require('fs')
     fs.writeFile('myjsonfile.json', '', function () { console.log('done') })
@@ -30,12 +23,17 @@ app.get('/api/list', (req, res) => {
     });
 });
 
+// var obj = {
+//     words: []
+// };
+// obj.words.push("naruto");
+// var json = JSON.stringify(obj);
+// fs.writeFile('myjsonfile.json', json, 'utf8', function (err) {
+//     if (err) throw err;
+//     console.log('complete');
+// });
 
 app.get('/api/:something', (req, res) => {
-    fs.writeFile('myjsonfile.json', json, 'utf8', function (err) {
-        if (err) throw err;
-        console.log('complete');
-    });
     fs.readFile('myjsonfile.json', 'utf8', function readFileCallback(err, data) {
         if (err) {
             console.log(err);
