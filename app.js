@@ -5,9 +5,14 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
 app.get('/api/delete', (req, res) => {
-    const fs = require('fs')
-    fs.writeFile('myjsonfile.json', '', function () { console.log('done') })
-    res.send('all content deleted')
+
+    fs.unlink('myjsonfile.json', function (err) {
+        if (err) throw err;
+        // if no error, file has been deleted successfully
+        res.send('deleted successfully')
+    });
+    // fs.writeFile('myjsonfile.json', '', function () { console.log('done') })
+    // res.send('all content deleted')
 });
 
 app.get('/api/list', (req, res) => {
@@ -23,28 +28,36 @@ app.get('/api/list', (req, res) => {
     });
 });
 
-// var obj = {
-//     words: []
-// };
-// obj.words.push("naruto");
-// var json = JSON.stringify(obj);
-// fs.writeFile('myjsonfile.json', json, 'utf8', function (err) {
-//     if (err) throw err;
-//     console.log('complete');
-// });
 
 app.get('/api/:something', (req, res) => {
-    fs.readFile('myjsonfile.json', 'utf8', function readFileCallback(err, data) {
+
+    fs.access('myjsonfile.json', fs.F_OK, (err) => {
         if (err) {
-            console.log(err);
+            var obj = {
+                words: []
+            };
+            obj.words.push(req.params.something);
+            var json = JSON.stringify(obj);
+            fs.writeFile('myjsonfile.json', json, 'utf8', function (err) {
+                if (err) throw err;
+                res.send('file created and word added')
+            });
+
         } else {
-            obj = JSON.parse(data); //now it an object
-            obj.words.push(req.params.something); //add some data
-            json = JSON.stringify(obj); //convert it back to json
-            fs.writeFile('myjsonfile.json', json, 'utf8', err => console.log(err)); // write it back 
-            res.send('word added successfully')
+            fs.readFile('myjsonfile.json', 'utf8', function readFileCallback(err, data) {
+                if (err) {
+                    console.log(err);
+                } else {
+                    obj = JSON.parse(data); //now it an object
+                    obj.words.push(req.params.something); //add some data
+                    json = JSON.stringify(obj); //convert it back to json
+                    fs.writeFile('myjsonfile.json', json, 'utf8', err => console.log(err)); // write it back 
+                    res.send('word added successfully')
+                }
+            });    // data = req.params.something;
+
         }
-    });    // data = req.params.something;
+    })
     // fs.appendFile('words.txt', data, function (err) {
     //     if (err) throw err;
     //     res.send('success')
